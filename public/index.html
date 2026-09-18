@@ -15,6 +15,7 @@
       <input id="nameInput" maxlength="16" placeholder="Your wobbly name" autocomplete="off" />
       <button id="joinBtn">Join World</button>
       <p class="hint">WASD move · Space jump · Mouse drag look · E interact</p>
+      <p class="hint">Find 🛠️ Crazy Creations to build with real physics</p>
     </div>
   </div>
 
@@ -22,6 +23,12 @@
     <div id="moneyPanel">💰 $<span id="moneyValue">0</span></div>
     <div id="biomePanel"></div>
     <div id="promptPanel" class="hidden"></div>
+    <div id="creationsPanel" class="hidden">
+      <div class="title">🛠️ Wobbly Worlds <span class="mode">MODE: CRAZY CREATIONS</span></div>
+      <div class="row-label">Tools</div>
+      <div id="toolRow" class="iconRow"></div>
+      <div class="hint2">[1-5] or click icon to select · [F] place</div>
+    </div>
     <div id="playerListPanel"><div class="title">Players</div><div id="playerListItems"></div></div>
     <div id="toast" class="hidden"></div>
     <div id="crosshair"></div>

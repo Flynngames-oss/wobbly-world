@@ -47,6 +47,27 @@ export const STARTING_MONEY = 400;
 export const ECONOMY_TICK_MS = 5000; // pay out passive business income every 5s
 export const WORLD_HALF_SIZE = 340; // ground plane extends -340..340 on x/z
 
+// ---- Crazy Creations: a physics sandbox zone, tucked away from the biomes ----
+export const CREATIONS_ZONE = { name: "🛠️ Crazy Creations", center: { x: 240, z: 240 }, radius: 42 };
+
+export const CREATION_TOOLS = [
+  { id: "block", name: "Block", icon: "🧱", key: "1" },
+  { id: "spring", name: "Spring", icon: "🌀", key: "2" },
+  { id: "fan", name: "Fan", icon: "🌬️", key: "3" },
+  { id: "bomb", name: "Bomb", icon: "💣", key: "4" },
+  { id: "barrel", name: "Barrel", icon: "🛢️", key: "5" },
+];
+
+export const MAX_SANDBOX_PROPS = 40;
+
+export function distXZ(x1, z1, x2, z2) {
+  return Math.hypot(x1 - x2, z1 - z2);
+}
+
+export function inCreationsZone(x, z) {
+  return distXZ(x, z, CREATIONS_ZONE.center.x, CREATIONS_ZONE.center.z) <= CREATIONS_ZONE.radius;
+}
+
 export function biomeAt(x, z) {
   let best = null;
   let bestDist = Infinity;

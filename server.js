@@ -3,7 +3,10 @@ import http from "http";
 import { WebSocketServer } from "ws";
 import {
   BUSINESSES, JOBS, VEHICLES, STARTING_MONEY, ECONOMY_TICK_MS,
+  CREATION_TOOLS, MAX_SANDBOX_PROPS,
 } from "./src/worldConfig.js";
+
+const VALID_PROP_TYPES = new Set(CREATION_TOOLS.map((t) => t.id));
 
 const PORT = process.env.PORT || 3000;
 
@@ -36,6 +39,18 @@ const vehicles = new Map(
 
 // ---- Job cooldowns per account key ----
 const jobCooldowns = new Map(); // accountKey -> { jobId: timestamp }
+
+// ---- Live sandbox props (Crazy Creations zone) ----
+/** @type {Map<string, {id, type, x,y,z, ry, qx,qy,qz,qw, color, ownerId}>} */
+const sandboxProps = new Map();
+let nextPropId = 1;
+
+function publicProp(p) {
+  return {
+    id: p.id, type: p.type, x: p.x, y: p.y, z: p.z, ry: p.ry,
+    qx: p.qx, qy: p.qy, qz: p.qz, qw: p.qw, color: p.color, ownerId: p.ownerId,
+  };
+}
 
 // ---- Live connected players ----
 /** @type {Map<string, {ws, id, name, accountKey, x:number,y:number,z:number,ry:number,anim:string,vehicleId:string|null}>} */
@@ -94,6 +109,7 @@ wss.on("connection", (ws) => {
         businesses: [...businesses.values()].map(publicBusiness),
         vehicles: [...vehicles.values()].map(publicVehicle),
         jobs: JOBS.map((j) => ({ id: j.id })),
+        sandboxProps: [...sandboxProps.values()].map(publicProp),
       });
       broadcast("playerJoined", { player: publicPlayer(player) }, id);
       return;
@@ -179,6 +195,60 @@ wss.on("connection", (ws) => {
       case "chat": {
         const text = String(msg.text || "").slice(0, 140);
         if (text) broadcast("chat", { id: player.id, name: player.name, text });
+        break;
+      }
+
+      case "spawnProp": {
+        const type = String(msg.propType || "");
+        if (!VALID_PROP_TYPES.has(type)) break;
+        if (sandboxProps.size >= MAX_SANDBOX_PROPS) {
+          const oldestId = sandboxProps.keys().next().value;
+          if (oldestId !== undefined) {
+            sandboxProps.delete(oldestId);
+            broadcast("propRemoved", { id: oldestId });
+          }
+        }
+        const id = String(nextPropId++);
+        const prop = {
+          id, type,
+          x: Number(msg.x) || 0, y: Number(msg.y) || 0, z: Number(msg.z) || 0,
+          ry: Number(msg.ry) || 0,
+          qx: undefined, qy: undefined, qz: undefined, qw: undefined,
+          color: Number.isFinite(msg.color) ? msg.color : null,
+          ownerId: player.id,
+        };
+        sandboxProps.set(id, prop);
+        broadcast("propSpawned", { prop: publicProp(prop) });
+        break;
+      }
+
+      case "propsMoved": {
+        if (!Array.isArray(msg.list)) break;
+        const out = [];
+        for (const item of msg.list) {
+          const p = sandboxProps.get(String(item.id));
+          if (!p || p.ownerId !== player.id) continue;
+          p.x = item.x; p.y = item.y; p.z = item.z;
+          p.qx = item.qx; p.qy = item.qy; p.qz = item.qz; p.qw = item.qw;
+          out.push({ id: p.id, x: p.x, y: p.y, z: p.z, qx: p.qx, qy: p.qy, qz: p.qz, qw: p.qw });
+        }
+        if (out.length) broadcast("propsMoved", { list: out }, player.id);
+        break;
+      }
+
+      case "propExploded": {
+        const p = sandboxProps.get(String(msg.id));
+        if (!p || p.ownerId !== player.id) break;
+        sandboxProps.delete(p.id);
+        broadcast("propExploded", { id: p.id });
+        break;
+      }
+
+      case "propRemoved": {
+        const p = sandboxProps.get(String(msg.id));
+        if (!p || p.ownerId !== player.id) break;
+        sandboxProps.delete(p.id);
+        broadcast("propRemoved", { id: p.id });
         break;
       }
     }

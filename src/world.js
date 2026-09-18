@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { BIOMES, WORLD_HALF_SIZE } from "./worldConfig.js";
+import { BIOMES, WORLD_HALF_SIZE, CREATIONS_ZONE } from "./worldConfig.js";
 
 function box(w, h, d, color) {
   const geo = new THREE.BoxGeometry(w, h, d);
@@ -145,6 +145,65 @@ const BIOME_BUILDERS = {
   },
 };
 
+function buildCreationsYard(scene) {
+  const { center, radius } = CREATIONS_ZONE;
+  const group = new THREE.Group();
+  group.position.set(center.x, 0, center.z);
+  scene.add(group);
+
+  // Bright checkered-feeling platform so it reads as a "toy box" from a distance
+  const platform = addShadow(new THREE.Mesh(
+    new THREE.CircleGeometry(radius, 48),
+    new THREE.MeshLambertMaterial({ color: 0xffe38a })
+  ));
+  platform.rotation.x = -Math.PI / 2;
+  platform.position.y = 0.03;
+  group.add(platform);
+
+  const innerRing = new THREE.Mesh(
+    new THREE.RingGeometry(radius * 0.55, radius * 0.6, 48),
+    new THREE.MeshBasicMaterial({ color: 0xff8a3c, side: THREE.DoubleSide })
+  );
+  innerRing.rotation.x = -Math.PI / 2;
+  innerRing.position.y = 0.04;
+  group.add(innerRing);
+
+  // Striped fence posts ringing the yard
+  const postCount = 28;
+  for (let i = 0; i < postCount; i++) {
+    const a = (i / postCount) * Math.PI * 2;
+    const px = Math.cos(a) * radius;
+    const pz = Math.sin(a) * radius;
+    const post = addShadow(cyl(0.14, 0.14, 1.4, i % 2 === 0 ? 0xff5c3c : 0xffffff));
+    post.position.set(px, 0.7, pz);
+    group.add(post);
+  }
+
+  // Decorative oversized toy blocks + a giant spring near the entrance — pure scenery
+  const deco = [
+    { x: -radius * 0.7, z: -radius * 0.55, color: 0xe74c3c, s: 3.2 },
+    { x: -radius * 0.55, z: -radius * 0.7, color: 0x3498db, s: 2.4 },
+    { x: radius * 0.72, z: radius * 0.5, color: 0x2ecc71, s: 2.8 },
+    { x: radius * 0.55, z: radius * 0.68, color: 0xf1c40f, s: 2.0 },
+  ];
+  for (const d of deco) {
+    const b = addShadow(box(d.s, d.s, d.s, d.color));
+    b.position.set(d.x, d.s / 2, d.z);
+    b.rotation.y = rand(-0.3, 0.3);
+    group.add(b);
+  }
+
+  // Entrance signpost
+  const pole = addShadow(cyl(0.22, 0.28, 5.2, 0x6b4a2f));
+  pole.position.set(0, 2.6, -radius - 6);
+  group.add(pole);
+  const board = addShadow(box(5.6, 2.0, 0.3, 0xffffff));
+  board.position.set(0, 5.4, -radius - 6);
+  group.add(board);
+
+  return group;
+}
+
 export function buildWorld(scene) {
   // Base wilderness ground
   const groundGeo = new THREE.PlaneGeometry(WORLD_HALF_SIZE * 2, WORLD_HALF_SIZE * 2);
@@ -169,6 +228,8 @@ export function buildWorld(scene) {
     const builder = BIOME_BUILDERS[key];
     if (builder) builder(propsGroup, b.center, b.radius);
   }
+
+  buildCreationsYard(scene);
 
   // Sky
   scene.background = new THREE.Color(0x9fd3f0);

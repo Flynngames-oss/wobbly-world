@@ -38,6 +38,23 @@ canvas { display: block; }
   padding: 10px 18px; border-radius: 10px; font-size: 15px;
 }
 #promptPanel.hidden { display: none; }
+#creationsPanel {
+  position: absolute; top: 16px; left: 16px; background: rgba(15,20,35,0.8); padding: 12px 16px; border-radius: 12px;
+  font-size: 13px; min-width: 220px; pointer-events: auto; border: 1px solid rgba(255,255,255,0.15);
+}
+#creationsPanel.hidden { display: none; }
+#creationsPanel .title { font-size: 15px; font-weight: 800; margin-bottom: 6px; }
+#creationsPanel .mode { display: block; font-size: 10px; color: #ffcf4a; letter-spacing: 0.5px; margin-top: 2px; }
+#creationsPanel .row-label { font-size: 10px; opacity: 0.6; text-transform: uppercase; margin: 8px 0 4px; }
+#creationsPanel .hint2 { font-size: 10px; opacity: 0.6; margin-top: 8px; }
+.iconRow { display: flex; gap: 6px; }
+.toolIcon {
+  width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center; font-size: 20px; cursor: pointer;
+  border: 2px solid transparent; transition: transform 0.1s;
+}
+.toolIcon:hover { transform: scale(1.08); }
+.toolIcon.selected { border-color: #ffcf4a; background: rgba(255,207,74,0.25); }
 #playerListPanel {
   position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.45); padding: 10px 14px; border-radius: 10px;
   font-size: 13px; min-width: 130px;
