@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wobbly World</title>
+  <link rel="icon" href="data:," />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="login">
+    <div id="loginBox">
+      <h1>🫨 Wobbly World</h1>
+      <p>An open-world multiplayer life sim prototype</p>
+      <input id="nameInput" maxlength="16" placeholder="Your wobbly name" autocomplete="off" />
+      <button id="joinBtn">Join World</button>
+      <p class="hint">WASD move · Space jump · Mouse drag look · E interact</p>
+    </div>
+  </div>
+
+  <div id="hud" class="hidden">
+    <div id="moneyPanel">💰 $<span id="moneyValue">0</span></div>
+    <div id="biomePanel"></div>
+    <div id="promptPanel" class="hidden"></div>
+    <div id="playerListPanel"><div class="title">Players</div><div id="playerListItems"></div></div>
+    <div id="toast" class="hidden"></div>
+    <div id="crosshair"></div>
+  </div>
+
+  <script type="module" src="bundle.js"></script>
+</body>
+</html>

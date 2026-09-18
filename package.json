@@ -1,0 +1,21 @@
+{
+  "name": "wobbly-world",
+  "version": "0.1.0",
+  "description": "Open-world multiplayer physics-based life sim prototype (Wobbly Life-inspired)",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/main.js --bundle --outfile=public/bundle.js --format=esm",
+    "postinstall": "npm run build",
+    "watch": "esbuild src/main.js --bundle --outfile=public/bundle.js --format=esm --watch",
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "three": "^0.169.0",
+    "ws": "^8.18.0",
+    "express": "^4.21.0",
+    "esbuild": "^0.24.0"
+  }
+}
