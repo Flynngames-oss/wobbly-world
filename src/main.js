@@ -407,6 +407,12 @@ function startGame(myName) {
       player.ry = lerpAngle(player.ry, targetRy, 1 - Math.pow(0.0001, dt));
       player.x += Math.sin(moveAngle) * MOVE_SPEED * dt;
       player.z += Math.cos(moveAngle) * MOVE_SPEED * dt;
+
+      // Camera eases in behind the player automatically while walking,
+      // unless the player is actively steering it with the mouse.
+      if (!dragging) {
+        camYaw = lerpAngle(camYaw, player.ry, 1 - Math.pow(0.002, dt));
+      }
     }
 
     let jumped = false;
@@ -449,6 +455,12 @@ function startGame(myName) {
       vehYaw += steer * TURN * dt * throttle;
       ent.mesh.position.x += Math.sin(vehYaw) * SPEED * dt * throttle;
       ent.mesh.position.z += Math.cos(vehYaw) * SPEED * dt * throttle;
+
+      // Camera eases in behind the vehicle automatically while driving,
+      // unless the player is actively steering it with the mouse.
+      if (!dragging) {
+        camYaw = lerpAngle(camYaw, vehYaw, 1 - Math.pow(0.002, dt));
+      }
     }
     ent.mesh.rotation.y = vehYaw;
 
